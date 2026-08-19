@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanasBelajar - Aplikasi Quiz</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =============================================
+         NAVIGASI
+         ============================================= -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="index.html" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="input-soal.html">Input Soal</a></li>
+                <li><a href="mulai-quiz.html">Mulai Quiz</a></li>
+                <li><a href="daftar-nilai.html">Daftar Nilai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- =============================================
+         KONTEN UTAMA
+         ============================================= -->
+    <main>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>🍍 NanasBelajar</h1>
+            <p>Sistem quiz sederhana untuk belajar dan berlatih. Guru dapat memasukkan soal, siswa dapat mengerjakan quiz, dan hasil langsung tersimpan.</p>
+
+            <div class="grup-tombol-hero">
+                <a href="mulai-quiz.html" class="tombol tombol-primer">▶ Mulai Quiz</a>
+                <a href="input-soal.html" class="tombol tombol-sekunder">✏ Input Soal</a>
+                <a href="daftar-nilai.html" class="tombol tombol-abu">📋 Daftar Nilai</a>
+            </div>
+        </section>
+
+        <!-- Fitur Unggulan -->
+        <section>
+            <h2>Cara Penggunaan</h2>
+            <div class="kartu-fitur-grid">
+
+                <div class="kartu-fitur">
+                    <h3>1. Input Soal</h3>
+                    <p>Guru mengetik soal dalam format teks sederhana. Sistem akan memecah teks menjadi soal secara otomatis.</p>
+                </div>
+
+                <div class="kartu-fitur">
+                    <h3>2. Preview & Simpan</h3>
+                    <p>Periksa hasil parsing soal sebelum disimpan. Jika ada kesalahan, bisa diedit kembali.</p>
+                </div>
+
+                <div class="kartu-fitur">
+                    <h3>3. Kerjakan Quiz</h3>
+                    <p>Siswa memasukkan nama lalu mengerjakan semua soal dengan memilih jawaban yang tersedia.</p>
+                </div>
+
+                <div class="kartu-fitur">
+                    <h3>4. Lihat Nilai</h3>
+                    <p>Setelah selesai, nilai langsung dihitung dan ditampilkan beserta review jawaban soal per soal.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Info penyimpanan -->
+        <section style="margin-top: 2rem;">
+            <div class="kartu">
+                <div class="kartu-judul">Informasi Penyimpanan</div>
+                <p style="margin-bottom:0;">Data soal dan hasil quiz disimpan di <strong>localStorage</strong> browser ini. Data akan tetap ada meskipun browser ditutup, tetapi akan hilang jika Anda menghapus data browser atau membuka di browser/perangkat yang berbeda.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =============================================
+         JAVASCRIPT
+         ============================================= -->
+    <!-- Urutan pemuatan script penting:
+         storage.js dimuat lebih dulu karena fungsinya
+         dipakai oleh file JS yang lain. -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Tandai tautan navigasi yang aktif
+        tandaiNavAktif();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Quiz - NanasBelajar</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =============================================
+         NAVIGASI
+         ============================================= -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="index.html" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="input-soal.html">Input Soal</a></li>
+                <li><a href="mulai-quiz.html">Mulai Quiz</a></li>
+                <li><a href="daftar-nilai.html">Daftar Nilai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- =============================================
+         KONTEN UTAMA
+         ============================================= -->
+    <main id="kontainer-hasil">
+
+        <div class="halaman-header">
+            <h1>Hasil Quiz</h1>
+            <p>Tanggal: <span id="hasil-tanggal">-</span></p>
+        </div>
+
+        <!-- Ringkasan Nilai -->
+        <section>
+            <h2>Ringkasan Nilai</h2>
+
+            <!-- Nama peserta -->
+            <div class="kartu" style="margin-bottom:1.25rem;">
+                <div class="kartu-judul">Nama Peserta</div>
+                <p style="font-size:1.3rem; font-weight:700; color:#1f2937; margin-bottom:0;" id="hasil-nama">-</p>
+            </div>
+
+            <!-- Kotak-kotak angka -->
+            <div class="ringkasan-nilai">
+
+                <div class="kotak-nilai kotak-nilai-besar">
+                    <div class="angka" id="hasil-nilai">-</div>
+                    <div class="label-angka">Nilai</div>
+                </div>
+
+                <div class="kotak-nilai">
+                    <div class="angka" style="color:#16a34a;" id="hasil-benar">-</div>
+                    <div class="label-angka">Benar</div>
+                </div>
+
+                <div class="kotak-nilai">
+                    <div class="angka" style="color:#dc2626;" id="hasil-salah">-</div>
+                    <div class="label-angka">Salah</div>
+                </div>
+
+                <div class="kotak-nilai">
+                    <div class="angka" id="hasil-total">-</div>
+                    <div class="label-angka">Total Soal</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Tombol aksi -->
+        <div class="grup-tombol" style="margin-top:1rem; margin-bottom:2rem;">
+            <a href="mulai-quiz.html" class="tombol tombol-primer">▶ Quiz Lagi</a>
+            <a href="daftar-nilai.html" class="tombol tombol-sekunder">📋 Daftar Nilai</a>
+            <a href="index.html" class="tombol tombol-abu">🏠 Beranda</a>
+        </div>
+
+        <!-- Review Jawaban -->
+        <section>
+            <h2>Review Jawaban</h2>
+            <p>Berikut adalah review jawaban soal per soal.</p>
+
+            <!-- Diisi oleh JavaScript -->
+            <div id="kontainer-review">
+                <p style="color:#6b7280;">Memuat review...</p>
+            </div>
+        </section>
+
+        <!-- Tombol di bawah -->
+        <div class="grup-tombol" style="margin-top:2rem;">
+            <a href="mulai-quiz.html" class="tombol tombol-primer">▶ Quiz Lagi</a>
+            <a href="daftar-nilai.html" class="tombol tombol-sekunder">📋 Daftar Nilai</a>
+        </div>
+
+    </main>
+
+    <!-- =============================================
+         JAVASCRIPT
+         ============================================= -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/result.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Tandai navigasi aktif
+        tandaiNavAktif();
+
+        // Inisialisasi halaman hasil
+        inisialisasiHalamanHasil();
+    </script>
+
+</body>
+</html>

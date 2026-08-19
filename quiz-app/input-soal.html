@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Soal - NanasBelajar</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =============================================
+         NAVIGASI
+         ============================================= -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="index.html" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="input-soal.html">Input Soal</a></li>
+                <li><a href="mulai-quiz.html">Mulai Quiz</a></li>
+                <li><a href="daftar-nilai.html">Daftar Nilai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- =============================================
+         KONTEN UTAMA
+         ============================================= -->
+    <main>
+
+        <div class="halaman-header">
+            <h1>Input Soal</h1>
+            <p>Ketik atau tempel soal di bawah ini sesuai format yang ditentukan, lalu tekan "Parse Soal".</p>
+        </div>
+
+        <!-- Panduan Format -->
+        <section>
+            <div class="kartu">
+                <div class="kartu-judul">Format Soal</div>
+                <p style="margin-bottom:0.75rem; font-size:0.9rem;">Setiap soal harus mengikuti format berikut. Pisahkan antar soal dengan baris kosong.</p>
+                <div class="kotak-format">
+<pre>SOAL 1
+Apa ibu kota Indonesia?
+A. Bandung
+B. Jakarta
+C. Surabaya
+D. Medan
+JAWABAN: B
+
+SOAL 2
+Planet tempat kita tinggal adalah?
+A. Mars
+B. Venus
+C. Bumi
+D. Jupiter
+JAWABAN: C</pre>
+                </div>
+                <p style="margin-bottom:0; font-size:0.85rem; color:#6b7280;">
+                    Aturan: baris "SOAL N" wajib ada, opsi harus A B C D, dan "JAWABAN:" diisi huruf A, B, C, atau D.
+                </p>
+            </div>
+        </section>
+
+        <!-- Form Input Soal -->
+        <section>
+            <div class="grup-form">
+                <label for="textarea-soal">Teks Soal</label>
+                <textarea
+                    id="textarea-soal"
+                    class="textarea-soal"
+                    placeholder="Ketik atau tempel soal di sini..."
+                    spellcheck="false"
+                ></textarea>
+                <p class="teks-bantuan">Anda bisa menekan tombol "Muat Contoh Soal" untuk mengisi dengan data contoh.</p>
+            </div>
+
+            <!-- Pesan error parsing (disembunyikan awalnya) -->
+            <div id="pesan-error-parse" class="pesan-error" style="display:none;"></div>
+
+            <!-- Tombol aksi -->
+            <div class="grup-tombol">
+                <button id="tombol-parse" class="tombol tombol-primer">
+                    🔍 Parse Soal
+                </button>
+                <button id="tombol-contoh" class="tombol tombol-abu">
+                    📝 Muat Contoh Soal
+                </button>
+            </div>
+        </section>
+
+        <!-- Info soal tersimpan -->
+        <section style="margin-top:2rem;">
+            <div class="kartu">
+                <div class="kartu-judul">Soal Tersimpan Saat Ini</div>
+                <div id="info-soal-tersimpan">
+                    <!-- Diisi oleh JavaScript -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =============================================
+         JAVASCRIPT
+         ============================================= -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Tandai navigasi aktif
+        tandaiNavAktif();
+
+        // Inisialisasi halaman ini
+        inisialisasiInputSoal();
+
+        // Tampilkan info soal yang sudah tersimpan
+        var elInfoSoal = document.getElementById('info-soal-tersimpan');
+        var soalTersimpan = muatSoal();
+        if (soalTersimpan.length === 0) {
+            elInfoSoal.innerHTML = '<p style="margin-bottom:0; color:#6b7280;">Belum ada soal tersimpan.</p>';
+        } else {
+            elInfoSoal.innerHTML =
+                '<p style="margin-bottom:0.5rem;"><strong>' + soalTersimpan.length + ' soal</strong> sedang tersimpan.</p>' +
+                '<p style="margin-bottom:0; font-size:0.85rem; color:#6b7280;">Jika Anda menyimpan soal baru, soal lama akan digantikan.</p>';
+        }
+    </script>
+
+</body>
+</html>

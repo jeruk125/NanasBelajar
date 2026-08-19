@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Soal - NanasBelajar</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =============================================
+         NAVIGASI
+         ============================================= -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="index.html" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="input-soal.html">Input Soal</a></li>
+                <li><a href="mulai-quiz.html">Mulai Quiz</a></li>
+                <li><a href="daftar-nilai.html">Daftar Nilai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- =============================================
+         KONTEN UTAMA
+         ============================================= -->
+    <main>
+
+        <div class="halaman-header">
+            <h1>Preview Soal</h1>
+            <p id="jumlah-soal-preview">Memuat soal...</p>
+        </div>
+
+        <!-- Pesan konfirmasi setelah simpan (disembunyikan awalnya) -->
+        <div id="pesan-simpan" class="pesan-sukses" style="display:none;"></div>
+
+        <!-- Tombol aksi di bagian atas -->
+        <div class="grup-tombol" style="margin-bottom:1.5rem; margin-top:0;">
+            <button id="tombol-simpan-soal" class="tombol tombol-sukses">
+                💾 Simpan Soal
+            </button>
+            <button id="tombol-edit-soal" class="tombol tombol-sekunder">
+                ✏ Edit Soal
+            </button>
+        </div>
+
+        <!-- Kontainer untuk menampilkan preview soal -->
+        <!-- Diisi oleh JavaScript -->
+        <section id="kontainer-preview">
+            <p style="color:#6b7280;">Memuat preview...</p>
+        </section>
+
+        <!-- Tombol aksi di bagian bawah (duplikasi untuk kenyamanan) -->
+        <div class="grup-tombol" style="margin-top:1.5rem;">
+            <button id="tombol-simpan-soal-bawah" class="tombol tombol-sukses">
+                💾 Simpan Soal
+            </button>
+            <button id="tombol-edit-soal-bawah" class="tombol tombol-sekunder">
+                ✏ Edit Soal
+            </button>
+        </div>
+
+    </main>
+
+    <!-- =============================================
+         JAVASCRIPT
+         ============================================= -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Tandai navigasi aktif
+        tandaiNavAktif();
+
+        // Inisialisasi halaman preview
+        inisialisasiPreviewSoal();
+
+        // Tombol simpan & edit di bagian bawah
+        // Menghubungkan ke fungsi yang sama dengan tombol di atas
+        var tombolSimpanBawah = document.getElementById('tombol-simpan-soal-bawah');
+        var tombolEditBawah = document.getElementById('tombol-edit-soal-bawah');
+
+        if (tombolSimpanBawah) {
+            tombolSimpanBawah.addEventListener('click', function() {
+                // Klik tombol simpan yang di atas (sudah punya event listener)
+                var tombolSimpanAtas = document.getElementById('tombol-simpan-soal');
+                if (tombolSimpanAtas) tombolSimpanAtas.click();
+            });
+        }
+
+        if (tombolEditBawah) {
+            tombolEditBawah.addEventListener('click', function() {
+                window.location.href = 'input-soal.html';
+            });
+        }
+    </script>
+
+</body>
+</html>

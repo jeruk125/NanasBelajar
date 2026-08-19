@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Nilai - NanasBelajar</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =============================================
+         NAVIGASI
+         ============================================= -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="index.html" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="input-soal.html">Input Soal</a></li>
+                <li><a href="mulai-quiz.html">Mulai Quiz</a></li>
+                <li><a href="daftar-nilai.html">Daftar Nilai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- =============================================
+         KONTEN UTAMA
+         ============================================= -->
+    <main>
+
+        <div class="halaman-header">
+            <h1>Daftar Nilai</h1>
+            <p>Semua hasil quiz yang tersimpan ditampilkan di bawah ini.</p>
+        </div>
+
+        <!-- Tombol hapus semua hasil -->
+        <div style="margin-bottom:1.25rem; display:flex; justify-content:flex-end; gap:0.75rem; flex-wrap:wrap;">
+            <button id="tombol-hapus-hasil" class="tombol tombol-bahaya tombol-kecil">
+                🗑 Hapus Semua Hasil
+            </button>
+            <a href="mulai-quiz.html" class="tombol tombol-primer tombol-kecil">
+                ▶ Mulai Quiz Baru
+            </a>
+        </div>
+
+        <!-- Kontainer tabel - diisi oleh JavaScript -->
+        <section id="kontainer-daftar-nilai">
+            <p style="color:#6b7280;">Memuat data...</p>
+        </section>
+
+        <!-- Keterangan warna nilai -->
+        <div class="kartu" style="margin-top:1.5rem;">
+            <div class="kartu-judul">Keterangan Warna Nilai</div>
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.25rem;">
+                <span><span class="nilai-badge nilai-tinggi">80 - 100</span> Sangat Baik</span>
+                <span><span class="nilai-badge nilai-sedang">60 - 79</span> Cukup</span>
+                <span><span class="nilai-badge nilai-rendah">0 - 59</span> Perlu Belajar Lagi</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =============================================
+         JAVASCRIPT
+         ============================================= -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/result.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Tandai navigasi aktif
+        tandaiNavAktif();
+
+        // Inisialisasi tabel daftar nilai
+        inisialisasiDaftarNilai();
+
+        // Tombol hapus semua hasil
+        var tombolHapus = document.getElementById('tombol-hapus-hasil');
+        if (tombolHapus) {
+            tombolHapus.addEventListener('click', function() {
+                // Konfirmasi dulu sebelum menghapus
+                var konfirmasi = confirm(
+                    'Apakah Anda yakin ingin menghapus SEMUA data hasil quiz?\n\n' +
+                    'Tindakan ini tidak dapat dibatalkan.'
+                );
+
+                if (konfirmasi) {
+                    hapusSemuaHasil();
+                    // Muat ulang tampilan tabel
+                    inisialisasiDaftarNilai();
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

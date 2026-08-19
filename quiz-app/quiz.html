@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - NanasBelajar</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =============================================
+         NAVIGASI
+         ============================================= -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="index.html" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="input-soal.html">Input Soal</a></li>
+                <li><a href="mulai-quiz.html">Mulai Quiz</a></li>
+                <li><a href="daftar-nilai.html">Daftar Nilai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- =============================================
+         KONTEN UTAMA
+         ============================================= -->
+    <main>
+
+        <div class="halaman-header">
+            <h1>Quiz</h1>
+            <p>Peserta: <strong id="nama-peserta">-</strong></p>
+        </div>
+
+        <!-- Pesan error (disembunyikan awalnya) -->
+        <div id="pesan-error-quiz" class="pesan-error" style="display:none;"></div>
+
+        <!-- Kontainer soal - diisi oleh JavaScript -->
+        <section id="kontainer-soal">
+            <p style="color:#6b7280;">Memuat soal...</p>
+        </section>
+
+        <!-- Tombol selesai -->
+        <div class="grup-tombol" style="margin-top: 1.5rem;">
+            <button id="tombol-selesai" class="tombol tombol-primer" style="font-size:1rem; padding: 0.75rem 2rem;">
+                ✅ Selesai Quiz
+            </button>
+        </div>
+
+        <!-- Pesan pengingat -->
+        <p style="margin-top:1rem; font-size:0.85rem; color:#6b7280;">
+            Pastikan semua soal sudah dijawab sebelum menekan tombol Selesai Quiz.
+        </p>
+
+    </main>
+
+    <!-- =============================================
+         JAVASCRIPT
+         ============================================= -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Tandai navigasi aktif
+        tandaiNavAktif();
+
+        // Inisialisasi quiz (muat soal, tampilkan, pasang event)
+        inisialisasiQuiz();
+    </script>
+
+</body>
+</html>
