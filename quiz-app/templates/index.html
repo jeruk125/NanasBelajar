@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}NanasBelajar - Aplikasi Quiz{% endblock %}
+
+{% block content %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>🍍 NanasBelajar</h1>
+        <p>Sistem quiz sederhana untuk belajar dan berlatih. Guru dapat memasukkan soal, siswa dapat mengerjakan quiz, dan hasil langsung tersimpan ke database.</p>
+
+        <div class="grup-tombol-hero">
+            <a href="{{ url_for('mulai_quiz') }}" class="tombol tombol-primer">▶ Mulai Quiz</a>
+            <a href="{{ url_for('input_soal') }}" class="tombol tombol-sekunder">✏ Input Soal</a>
+            <a href="{{ url_for('daftar_nilai') }}" class="tombol tombol-abu">📋 Daftar Nilai</a>
+        </div>
+    </section>
+
+    <!-- Statistik singkat dari database -->
+    <section style="margin-bottom: 2rem;">
+        <div class="kartu" style="display:flex; gap:2rem; flex-wrap:wrap;">
+            <div>
+                <div class="kartu-judul">Soal Tersimpan</div>
+                <p style="font-size:2rem; font-weight:700; color:var(--warna-utama); margin:0;">
+                    {{ jumlah_soal }}
+                </p>
+            </div>
+            <div>
+                <div class="kartu-judul">Total Peserta</div>
+                <p style="font-size:2rem; font-weight:700; color:var(--warna-utama); margin:0;">
+                    {{ jumlah_peserta }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fitur -->
+    <section>
+        <h2>Cara Penggunaan</h2>
+        <div class="kartu-fitur-grid">
+            <div class="kartu-fitur">
+                <h3>1. Input Soal</h3>
+                <p>Guru mengetik soal dalam format teks sederhana. Sistem memecah teks menjadi soal secara otomatis.</p>
+            </div>
+            <div class="kartu-fitur">
+                <h3>2. Preview & Simpan</h3>
+                <p>Periksa hasil parsing soal sebelum disimpan ke database. Jika ada kesalahan, bisa diedit kembali.</p>
+            </div>
+            <div class="kartu-fitur">
+                <h3>3. Kerjakan Quiz</h3>
+                <p>Siswa memasukkan nama lalu mengerjakan semua soal. Soal diambil langsung dari database.</p>
+            </div>
+            <div class="kartu-fitur">
+                <h3>4. Lihat Nilai</h3>
+                <p>Nilai dihitung oleh server dan disimpan ke database. Bisa diakses dari komputer manapun di jaringan.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info penyimpanan -->
+    <section style="margin-top: 2rem;">
+        <div class="kartu">
+            <div class="kartu-judul">Informasi Penyimpanan</div>
+            <p style="margin-bottom:0;">Data soal dan hasil quiz disimpan di <strong>database SQLite</strong> di komputer server. Data dapat diakses dari perangkat manapun yang terhubung ke jaringan yang sama.</p>
+        </div>
+    </section>
+
+{% endblock %}

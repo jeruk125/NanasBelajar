@@ -1,6 +1,6 @@
 # 🍍 NanasBelajar - Aplikasi Quiz
 
-Aplikasi quiz sederhana berbasis web. Guru memasukkan soal dalam format teks, siswa mengerjakan quiz di browser, dan hasil langsung tersimpan tanpa memerlukan backend atau internet.
+Aplikasi quiz sederhana berbasis web. Guru memasukkan soal, siswa mengerjakan quiz dari komputer manapun di jaringan yang sama, dan hasil tersimpan permanen di database.
 
 ---
 
@@ -8,12 +8,11 @@ Aplikasi quiz sederhana berbasis web. Guru memasukkan soal dalam format teks, si
 
 | Teknologi | Kegunaan |
 |-----------|----------|
-| HTML | Struktur halaman |
-| CSS | Tampilan dan layout |
-| JavaScript (Vanilla) | Logika aplikasi |
-| localStorage | Penyimpanan data di browser |
-
-Tidak ada framework, tidak ada library, tidak ada backend, tidak ada database.
+| Python + Flask | Server web, routing, logika backend |
+| SQLite | Database penyimpanan soal dan hasil |
+| Jinja2 | Template engine (render HTML dari Python) |
+| HTML + CSS | Tampilan halaman |
+| JavaScript Vanilla | Parser soal di browser, validasi form |
 
 ---
 
@@ -22,322 +21,388 @@ Tidak ada framework, tidak ada library, tidak ada backend, tidak ada database.
 ```
 quiz-app/
 │
-├── index.html          ← Halaman utama / beranda
-├── input-soal.html     ← Halaman guru memasukkan soal
-├── preview-soal.html   ← Halaman preview sebelum soal disimpan
-├── mulai-quiz.html     ← Halaman peserta memasukkan nama
-├── quiz.html           ← Halaman mengerjakan quiz
-├── hasil.html          ← Halaman hasil dan review jawaban
-├── daftar-nilai.html   ← Halaman daftar semua nilai
+├── app.py          ← Aplikasi Flask utama, semua route di sini
+├── database.py     ← Fungsi koneksi dan inisialisasi database
+├── schema.sql      ← Definisi tabel SQLite
+├── nanasdb.sqlite  ← File database (dibuat otomatis saat pertama jalan)
+├── requirements.txt
 │
-├── css/
-│   └── style.css       ← Semua gaya tampilan
+├── templates/      ← File HTML yang dirender Flask (Jinja2)
+│   ├── base.html
+│   ├── index.html
+│   ├── input-soal.html
+│   ├── preview-soal.html
+│   ├── mulai-quiz.html
+│   ├── quiz.html
+│   ├── hasil.html
+│   └── daftar-nilai.html
 │
-└── js/
-    ├── storage.js      ← Fungsi simpan/baca localStorage
-    ├── parser.js       ← Fungsi memecah teks soal
-    ├── quiz.js         ← Logika halaman quiz
-    ├── result.js       ← Logika halaman hasil & daftar nilai
-    └── main.js         ← Inisialisasi halaman & contoh data
+└── static/         ← File CSS dan JS yang disajikan langsung ke browser
+    ├── css/
+    │   └── style.css
+    └── js/
+        ├── parser.js   ← Parser teks soal (pure JavaScript)
+        ├── main.js     ← Logika halaman input-soal
+        ├── quiz.js     ← Validasi form quiz
+        └── result.js   ← Utilitas escapeHtml
 ```
 
 ---
 
-## Cara Menjalankan Project
+## Cara Menjalankan (Pertama Kali)
 
-Karena ini adalah frontend murni (HTML + CSS + JS), **tidak perlu instalasi apapun**.
+### 1. Pastikan Python sudah terinstall
 
-**Cara paling sederhana:**
-1. Buka folder `quiz-app/` di File Explorer.
-2. Klik dua kali pada file `index.html`.
-3. File akan terbuka di browser default Anda.
+```
+python --version
+```
 
-**Cara yang direkomendasikan (menghindari masalah CORS):**
-Gunakan ekstensi **Live Server** di VS Code / Kiro:
-1. Klik kanan pada `index.html`.
-2. Pilih "Open with Live Server".
-3. Browser akan otomatis terbuka.
+Harus muncul Python 3.8 atau lebih baru.
+
+### 2. Buat virtual environment (opsional tapi direkomendasikan)
+
+Virtual environment memisahkan paket project ini dari sistem Python global.
+
+```
+python -m venv venv
+```
+
+### 3. Aktifkan virtual environment
+
+**Windows:**
+```
+venv\Scripts\activate
+```
+
+**Mac / Linux:**
+```
+source venv/bin/activate
+```
+
+Setelah aktif, prompt terminal akan menampilkan `(venv)` di depannya.
+
+### 4. Install Flask
+
+```
+pip install -r requirements.txt
+```
+
+### 5. Jalankan aplikasi
+
+```
+python app.py
+```
+
+Output yang akan muncul:
+
+```
+Database berhasil diinisialisasi: .../nanasdb.sqlite
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.x.x:5000
+```
+
+### 6. Buka di browser
+
+```
+http://127.0.0.1:5000
+```
+
+---
+
+## Cara Menjalankan (Setelah Pertama Kali)
+
+Cukup dua langkah:
+
+```
+venv\Scripts\activate
+python app.py
+```
+
+---
+
+## Akses dari Komputer Lain di Jaringan Lokal (LAN)
+
+Aplikasi sudah dikonfigurasi dengan `host='0.0.0.0'` sehingga dapat diakses dari komputer lain di jaringan yang sama.
+
+**Langkah-langkah:**
+
+1. Jalankan `python app.py` di komputer guru (server).
+2. Cari IP komputer guru. Di Windows, buka Command Prompt dan ketik:
+   ```
+   ipconfig
+   ```
+   Cari bagian **IPv4 Address**, contoh: `192.168.1.5`
+
+3. Dari komputer siswa, buka browser dan ketik:
+   ```
+   http://192.168.1.5:5000
+   ```
+
+4. Siswa bisa langsung membuka halaman Mulai Quiz dan mengerjakan quiz.
+
+**Syarat:** Kedua komputer harus terhubung ke jaringan WiFi atau LAN yang sama.
 
 ---
 
 ## Alur Penggunaan
 
 ```
-Guru memasukkan soal di input-soal.html
-          ↓
-    Parse Soal (JavaScript memecah teks)
-          ↓
-    Preview di preview-soal.html
-          ↓
-    Simpan ke localStorage
-          ↓
-Peserta masukkan nama di mulai-quiz.html
-          ↓
-    Kerjakan quiz di quiz.html
-          ↓
-    Tekan "Selesai Quiz"
-          ↓
-    Nilai dihitung oleh JavaScript
-          ↓
-    Hasil ditampilkan di hasil.html
-          ↓
-    Data disimpan ke localStorage
-          ↓
-Semua nilai tersedia di daftar-nilai.html
+Guru buka /input-soal
+    ↓
+Ketik soal, tekan "Parse Soal"
+    ↓
+JavaScript (parser.js) memecah teks menjadi data soal
+    ↓
+Data soal dikirim ke Flask via fetch() POST /preview-soal
+    ↓
+Flask menyimpan soal sementara di session
+    ↓
+Halaman /preview-soal menampilkan soal (Jinja2)
+    ↓
+Guru klik "Simpan Soal" → POST /simpan-soal
+    ↓
+Flask INSERT soal ke tabel questions (SQLite)
+    ↓
+Siswa buka /mulai-quiz, isi nama
+    ↓
+Flask simpan nama ke session → redirect ke /quiz
+    ↓
+Flask SELECT soal dari SQLite → render quiz.html
+    ↓
+Siswa jawab semua soal, klik "Selesai Quiz"
+    ↓
+Browser submit form POST /submit-quiz
+    ↓
+Flask ambil jawaban benar dari database
+Flask hitung nilai di Python
+Flask INSERT ke quiz_results dan answers
+    ↓
+Redirect ke /hasil/<result_id>
+    ↓
+Flask SELECT hasil + JOIN answers+questions
+Render hasil.html
+    ↓
+Guru buka /daftar-nilai
+Flask SELECT semua hasil ORDER BY created_at DESC
 ```
 
 ---
 
-## Cara Memasukkan Soal
+## Format Soal
 
-Buka `input-soal.html`, lalu ketik atau tempel soal dalam format berikut:
+Guru mengetik soal di halaman Input Soal dengan format berikut:
 
 ```
 SOAL 1
-Apa ibu kota negara Indonesia?
+Apa ibu kota Indonesia?
 A. Bandung
-B. Surabaya
-C. Jakarta
+B. Jakarta
+C. Surabaya
 D. Medan
-JAWABAN: C
+JAWABAN: B
 
 SOAL 2
-Planet tempat kita tinggal bernama?
+Planet tempat kita tinggal adalah?
 A. Mars
 B. Venus
-C. Jupiter
-D. Bumi
-JAWABAN: D
+C. Bumi
+D. Jupiter
+JAWABAN: C
 ```
 
-**Aturan format:**
-- Setiap soal diawali dengan baris `SOAL N` (N adalah nomor soal).
-- Baris berikutnya adalah pertanyaan.
-- Empat baris berikutnya adalah pilihan `A.` `B.` `C.` `D.`
-- Baris terakhir adalah `JAWABAN:` diikuti huruf A, B, C, atau D.
-- Pisahkan antar soal dengan **satu baris kosong**.
+**Aturan:**
+- Setiap soal diawali baris `SOAL N`
+- Baris berikutnya adalah pertanyaan
+- Empat baris `A.` `B.` `C.` `D.` adalah pilihan jawaban
+- `JAWABAN:` diisi huruf A, B, C, atau D
+- Pisahkan antar soal dengan satu baris kosong
 
 ---
 
-## Cara Kerja Parser
+## Cara Kerja Parser Soal
 
-Parser ada di file `js/parser.js`, fungsi utamanya adalah `parseQuestions(teks)`.
+Parser ada di `static/js/parser.js`. Fungsi utamanya adalah `parseQuestions(teks)`.
 
-**Langkah kerja parser:**
+**Langkah kerja:**
 
-### Langkah 1 — Pecah teks menjadi baris
-```javascript
-var semuaBaris = teks.split('\n');
-// Teks dipotong di setiap karakter baris baru
-// Hasilnya: ["SOAL 1", "Apa ibu kota?", "A. Bandung", ...]
+```
+Teks mentah dari textarea
+    ↓
+split('\n') → array baris
+    ↓
+kelompokkanMenjadiBlok() → setiap blok dimulai dari baris "SOAL N"
+    ↓
+parseSatuSoal() → baca setiap baris, identifikasi:
+    baris dimulai "A." → optionA
+    baris dimulai "JAWABAN:" → correctAnswer
+    baris lain → question
+    ↓
+validasiSoal() → periksa semua field ada
+    ↓
+Jika valid: kirim ke Flask via fetch() POST
+Jika error: tampilkan pesan ke pengguna
 ```
 
-### Langkah 2 — Kelompokkan baris menjadi blok soal
-Fungsi `kelompokkanMenjadiBlok()` membaca setiap baris satu per satu. Setiap kali menemukan baris yang dimulai dengan kata `SOAL`, fungsi ini mulai mengumpulkan baris-baris berikutnya menjadi satu "blok".
+Parser tetap berjalan di browser (JavaScript) agar Anda bisa belajar parsing di JavaScript. Hasilnya baru dikirim ke Flask untuk disimpan ke database.
 
-```javascript
-// Hasil blok: array of array
-[
-  ["SOAL 1", "Apa ibu kota?", "A. Bandung", "B. Jakarta", ...],
-  ["SOAL 2", "Planet kita?", "A. Mars", ...]
-]
+---
+
+## Cara Kerja Database
+
+### Membuka koneksi
+
+```python
+# database.py
+conn = sqlite3.connect('nanasdb.sqlite')
+conn.row_factory = sqlite3.Row  # agar bisa akses kolom by name
 ```
 
-### Langkah 3 — Parse setiap blok
-Fungsi `parseSatuSoal()` membaca baris satu per satu dalam satu blok dan mengidentifikasi bagiannya:
-- Baris dimulai `A.` → optionA
-- Baris dimulai `B.` → optionB
-- Baris dimulai `JAWABAN:` → correctAnswer
-- Baris lainnya → question (pertanyaan)
+### Menyimpan soal (parameterized query)
 
-### Langkah 4 — Validasi
-Setiap soal diperiksa kelengkapannya oleh fungsi `validasiSoal()`. Jika ada bagian yang hilang, pesan error yang jelas akan ditampilkan, misalnya: *"Soal 3 tidak valid: pilihan C tidak ditemukan."*
+```python
+# Aman dari SQL Injection karena pakai tanda tanya (?)
+conn.execute(
+    'INSERT INTO questions (question, option_a, correct_answer) VALUES (?, ?, ?)',
+    (soal['question'], soal['optionA'], soal['correctAnswer'])
+)
+conn.commit()
+```
 
-### Hasil akhir
-```javascript
-[
-  {
-    question: "Apa ibu kota negara Indonesia?",
-    optionA: "Bandung",
-    optionB: "Surabaya",
-    optionC: "Jakarta",
-    optionD: "Medan",
-    correctAnswer: "C"
-  },
-  // ...soal berikutnya
-]
+### Membaca soal
+
+```python
+soal = conn.execute('SELECT * FROM questions ORDER BY id').fetchall()
+# soal[0]['question'] → teks pertanyaan soal pertama
+```
+
+### JOIN dua tabel
+
+```python
+# Ambil jawaban peserta beserta teks soalnya sekaligus
+conn.execute('''
+    SELECT a.selected_answer, a.correct_answer, q.question
+    FROM answers a
+    JOIN questions q ON a.question_id = q.id
+    WHERE a.result_id = ?
+''', (result_id,))
 ```
 
 ---
 
-## Cara Kerja localStorage
+## Cara Kerja Session Flask
 
-localStorage adalah tempat penyimpanan data yang ada di dalam browser. Berbeda dengan variabel JavaScript biasa, data di localStorage **tidak hilang** ketika halaman di-refresh atau browser ditutup.
+Session dipakai untuk membawa data sementara antar halaman tanpa menyimpan di database.
 
-**Batasan localStorage:**
-- Hanya bisa menyimpan **string** (teks).
-- Karena itu, object/array JavaScript harus diubah menjadi string JSON terlebih dahulu.
+```python
+# Simpan nama peserta saat mulai quiz
+session['nama_peserta'] = 'Aditia'
 
-### Menyimpan data
+# Baca nama di halaman quiz
+nama = session.get('nama_peserta', '')
 
-```javascript
-// Ubah array/object menjadi string JSON
-var dataString = JSON.stringify(arraySoal);
-
-// Simpan ke localStorage dengan nama kunci
-localStorage.setItem('quizQuestions', dataString);
+# Hapus setelah quiz selesai
+session.pop('nama_peserta', None)
 ```
 
-### Membaca data
-
-```javascript
-// Ambil string dari localStorage
-var dataString = localStorage.getItem('quizQuestions');
-
-// Jika belum ada data, getItem mengembalikan null
-if (dataString === null) {
-    return []; // kembalikan array kosong
-}
-
-// Ubah string JSON kembali menjadi array/object
-var arraySoal = JSON.parse(dataString);
-```
-
-### Menghapus data
-
-```javascript
-// Hapus satu kunci
-localStorage.removeItem('quizQuestions');
-
-// Atau hapus semua data localStorage di domain ini
-localStorage.clear();
-```
-
-### Kunci yang digunakan aplikasi ini
-
-| Kunci | Isi | Dipakai di |
-|-------|-----|------------|
-| `quizQuestions` | Array soal yang sudah disimpan guru | input-soal, quiz |
-| `quizResults` | Array semua hasil quiz peserta | hasil, daftar-nilai |
-| `quizNamaPeserta` | Nama peserta sementara | mulai-quiz → quiz |
-| `quizSoalPreview` | Soal sementara sebelum dikonfirmasi | input-soal → preview |
-| `quizIndeksHasilTerakhir` | Indeks hasil yang sedang dilihat | quiz → hasil, daftar-nilai → hasil |
+Session disimpan di cookie browser yang dienkripsi dengan `secret_key`. Pengguna tidak bisa membaca atau mengubah isinya.
 
 ---
 
-## Cara Kerja Quiz (Membaca Radio Button)
+## Cara Kerja Pengiriman Soal dari Browser ke Flask
 
-Di `quiz.html`, setiap soal ditampilkan dengan 4 radio button. Setiap grup radio button untuk satu soal memiliki `name` yang sama, misalnya `name="soal-0"` untuk soal pertama.
-
-Karena semua radio button dalam satu grup memiliki `name` yang sama, browser otomatis memastikan hanya satu yang bisa dipilih.
-
-Untuk membaca jawaban yang dipilih:
+Di `static/js/main.js`, fungsi `jalankanParseSoal()` mengirim data JSON ke Flask:
 
 ```javascript
-// Ambil semua radio button dalam grup soal ke-0
-var radioButtons = document.getElementsByName('soal-0');
+// JavaScript mengirim array soal ke Flask
+fetch('/preview-soal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ soal: hasilParse.soal })
+})
+```
 
-var jawabanTerpilih = null;
+Flask menerimanya di `app.py`:
 
-// Loop setiap radio button
-for (var j = 0; j < radioButtons.length; j++) {
-    if (radioButtons[j].checked) {
-        // Radio button ini yang dipilih
-        jawabanTerpilih = radioButtons[j].value; // "A", "B", "C", atau "D"
-        break;
-    }
-}
+```python
+@app.route('/preview-soal', methods=['POST'])
+def preview_soal():
+    data = request.get_json()      # baca JSON dari browser
+    daftar_soal = data['soal']     # ambil array soal
+    session['soal_preview'] = daftar_soal  # simpan ke session
+    return jsonify({'sukses': True})
 ```
 
 ---
 
 ## Cara Kerja Perhitungan Nilai
 
-Setelah peserta menekan "Selesai Quiz", fungsi `hitungHasil()` di `quiz.js` bekerja:
+Nilai **tidak dihitung di browser**, melainkan di Python oleh Flask:
 
-```javascript
-// 1. Hitung jumlah jawaban benar
-var jumlahBenar = 0;
+```python
+# app.py, fungsi submit_quiz()
+jumlah_benar = 0
 
-for (var i = 0; i < daftarSoal.length; i++) {
-    var jawabanPeserta = semuaJawaban[i];   // "A", "B", "C", atau "D"
-    var jawabanBenar   = daftarSoal[i].correctAnswer;
+for soal in daftar_soal:             # soal dari DATABASE
+    nama_field = f'jawaban_{soal["id"]}'
+    jawaban_peserta = request.form.get(nama_field, '').upper()
+    jawaban_benar   = soal['correct_answer']   # dari DATABASE
 
-    if (jawabanPeserta === jawabanBenar) {
-        jumlahBenar++;
-    }
-}
+    if jawaban_peserta == jawaban_benar:
+        jumlah_benar += 1
 
-// 2. Hitung jumlah salah
-var jumlahSalah = daftarSoal.length - jumlahBenar;
-
-// 3. Hitung nilai dengan rumus: (benar / total) × 100
-var nilai = Math.round((jumlahBenar / daftarSoal.length) * 100);
+nilai = math.floor((jumlah_benar / len(daftar_soal)) * 100)
 ```
 
-**Contoh:** 10 soal, 8 benar → `(8 / 10) × 100 = 80`
+Kunci keamanannya: jawaban benar diambil dari database, bukan dari form browser.
 
 ---
 
-## Cara Kerja Tampilan Hasil
+## Cara Kerja Jinja2
 
-Fungsi `inisialisasiHalamanHasil()` di `result.js` bekerja seperti ini:
+Flask mengirim data Python ke template HTML dengan `render_template()`:
 
-```javascript
-// 1. Baca indeks hasil dari localStorage
-var indeks = localStorage.getItem('quizIndeksHasilTerakhir');
-
-// 2. Ambil data hasil berdasarkan indeks
-var dataHasil = muatHasilByIndeks(indeks);
-
-// 3. Isi elemen HTML dengan data
-document.getElementById('hasil-nama').textContent  = dataHasil.name;
-document.getElementById('hasil-nilai').textContent = dataHasil.score;
-document.getElementById('hasil-benar').textContent = dataHasil.correct;
-
-// 4. Buat HTML review jawaban dan masukkan ke halaman
-var htmlReview = buatHtmlReviewJawaban(dataHasil.answers);
-document.getElementById('kontainer-review').innerHTML = htmlReview;
+```python
+# app.py
+return render_template('quiz.html',
+    nama_peserta=nama_peserta,
+    daftar_soal=daftar_soal
+)
 ```
+
+Di template, data tersebut diakses dengan `{{ }}` dan `{% %}`:
+
+```html
+<!-- templates/quiz.html -->
+<p>Peserta: <strong>{{ nama_peserta }}</strong></p>
+
+{% for soal in daftar_soal %}
+    <div>{{ soal.question }}</div>
+    <input type="radio" name="jawaban_{{ soal.id }}" value="A">
+    A. {{ soal.option_a }}
+{% endfor %}
+```
+
+Jinja2 otomatis meng-escape karakter HTML, sehingga aman dari XSS.
 
 ---
 
-## Cara Menghapus Data localStorage
+## Cara Menghapus Data
 
-### Via browser (Chrome/Edge):
-1. Tekan **F12** untuk membuka DevTools.
-2. Buka tab **Application**.
-3. Di panel kiri, pilih **Local Storage** → pilih domain Anda.
-4. Klik kanan pada kunci yang ingin dihapus, lalu pilih **Delete**.
-5. Atau klik tombol 🗑️ untuk menghapus semua.
+### Hapus semua hasil quiz
+Buka halaman **Daftar Nilai** → klik tombol **"Hapus Semua Hasil"**.
 
-### Via tombol di aplikasi:
-- Di halaman **Daftar Nilai**: ada tombol **"Hapus Semua Hasil"** untuk menghapus semua hasil quiz.
-- Untuk menghapus soal: masukkan soal baru dan simpan — soal lama akan tergantikan.
+### Hapus database sepenuhnya
+Hapus file `nanasdb.sqlite`. Database baru akan dibuat otomatis saat `python app.py` dijalankan kembali.
 
-### Via Console browser:
-```javascript
-// Hapus semua data aplikasi ini
-localStorage.removeItem('quizQuestions');
-localStorage.removeItem('quizResults');
-localStorage.removeItem('quizNamaPeserta');
-localStorage.removeItem('quizSoalPreview');
-localStorage.removeItem('quizIndeksHasilTerakhir');
-```
+### Melalui browser DevTools (untuk developer)
+Buka F12 → Console, lalu jalankan query SQLite tidak bisa dari browser.
+Untuk manipulasi database langsung, gunakan tools seperti **DB Browser for SQLite** (gratis, bisa didownload di sqlitebrowser.org).
 
 ---
 
 ## Catatan Penting
 
-> Data **hanya tersimpan di browser yang digunakan**. Jika peserta membuka aplikasi di browser atau perangkat yang berbeda, mereka tidak akan melihat data yang sama. Ini adalah keterbatasan localStorage yang akan diatasi ketika backend ditambahkan pada tahap berikutnya.
+> Aplikasi ini dirancang untuk jaringan lokal (LAN). Data tersimpan di file `nanasdb.sqlite` di komputer tempat Flask berjalan. Semua perangkat di jaringan yang sama mengakses database yang sama — berbeda dengan versi localStorage yang datanya terpisah per browser.
 
----
-
-## Rencana Pengembangan Selanjutnya
-
-Tahap ini hanya mencakup **frontend**. Pada tahap berikutnya akan ditambahkan:
-
-- Backend (server) untuk menyimpan data secara permanen
-- Database
-- Sistem login guru dan siswa
-- Fitur lanjutan seperti batas waktu, soal acak, dan ekspor nilai
+> Mode `debug=True` di `app.py` hanya untuk pengembangan. Jika sudah digunakan di lingkungan nyata, pertimbangkan untuk menggantinya dengan `debug=False`.

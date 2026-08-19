@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Mulai Quiz - NanasBelajar{% endblock %}
+
+{% block content %}
+
+    <div class="halaman-header">
+        <h1>Mulai Quiz</h1>
+        <p>Masukkan nama Anda untuk memulai quiz.</p>
+    </div>
+
+    {# Peringatan jika belum ada soal #}
+    {% if not ada_soal %}
+    <div class="pesan-error">
+        ⚠ Belum ada soal tersimpan. Silakan minta guru untuk memasukkan soal di
+        <a href="{{ url_for('input_soal') }}" style="color:inherit; font-weight:700;">
+            halaman Input Soal
+        </a> terlebih dahulu.
+    </div>
+    {% endif %}
+
+    <!-- Form nama peserta -->
+    {#
+        Form ini dikirim ke route POST /mulai-quiz (fungsi proses_nama_peserta).
+        method="POST" karena kita mengirim data (nama peserta).
+        Input dengan name="nama_peserta" akan dibaca di Flask dengan:
+        request.form.get('nama_peserta')
+    #}
+    <form action="{{ url_for('proses_nama_peserta') }}" method="POST">
+        <div class="kartu" style="max-width:480px;">
+
+            <div class="grup-form">
+                <label for="input-nama">Nama Peserta</label>
+                <input
+                    type="text"
+                    id="input-nama"
+                    name="nama_peserta"
+                    placeholder="Masukkan nama lengkap Anda..."
+                    maxlength="80"
+                    autocomplete="off"
+                    autofocus
+                    required
+                >
+                <p class="teks-bantuan">Nama ini akan digunakan sebagai identitas pada hasil quiz.</p>
+            </div>
+
+            <div class="grup-tombol" style="margin-top:1rem;">
+                <button type="submit" class="tombol tombol-primer"
+                    {% if not ada_soal %}disabled title="Belum ada soal"{% endif %}>
+                    ▶ Mulai Quiz
+                </button>
+                <a href="{{ url_for('index') }}" class="tombol tombol-abu">Batal</a>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- Info jumlah soal -->
+    <div class="kartu" style="max-width:480px; margin-top:1rem;">
+        <div class="kartu-judul">Informasi Quiz</div>
+        {% if ada_soal %}
+            <p style="margin-bottom:0;">
+                Quiz ini terdiri dari <strong>{{ jumlah_soal }} soal</strong>.
+                Setiap soal memiliki 4 pilihan jawaban.
+            </p>
+        {% else %}
+            <p style="margin-bottom:0; color:#6b7280;">Belum ada soal tersimpan.</p>
+        {% endif %}
+    </div>
+
+{% endblock %}

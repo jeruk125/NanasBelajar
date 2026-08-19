@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - NanasBelajar{% endblock %}
+
+{% block content %}
+
+    <div class="halaman-header">
+        <h1>Quiz</h1>
+        {#
+            nama_peserta dikirim dari Flask route quiz().
+            Jinja2 otomatis meng-escape karakter HTML untuk keamanan.
+        #}
+        <p>Peserta: <strong>{{ nama_peserta }}</strong></p>
+    </div>
+
+    {#
+        Form ini dikirim ke POST /submit-quiz saat tombol "Selesai Quiz" ditekan.
+
+        Setiap radio button diberi name="jawaban_<id_soal>".
+        Contoh: name="jawaban_1", name="jawaban_2", dst.
+
+        Mengapa pakai id soal dari database (bukan indeks)?
+        Karena id soal adalah identitas permanen di database.
+        Flask membaca jawaban dengan: request.form.get('jawaban_1')
+        lalu mencocokkan dengan soal id=1 di database.
+    #}
+    <form action="{{ url_for('submit_quiz') }}" method="POST" id="form-quiz">
+
+        {#
+            daftar_soal adalah list of sqlite3.Row dari query SELECT * FROM questions.
+            Setiap soal memiliki atribut: id, question, option_a, option_b, option_c, option_d, correct_answer
+            Di Jinja2 diakses dengan soal.id, soal.question, dst.
+        #}
+        {% for soal in daftar_soal %}
+        <div class="kartu-soal-quiz" id="kartu-soal-{{ loop.index0 }}">
+
+            <div class="nomor-soal">Soal {{ loop.index }}</div>
+            <div class="teks-soal">{{ soal.question }}</div>
+
+            <div class="opsi-radio">
+                {# Radio button A #}
+                <label class="label-opsi" for="soal-{{ soal.id }}-A">
+                    <input type="radio"
+                           id="soal-{{ soal.id }}-A"
+                           name="jawaban_{{ soal.id }}"
+                           value="A"
+                           required>
+                    A. {{ soal.option_a }}
+                </label>
+
+                {# Radio button B #}
+                <label class="label-opsi" for="soal-{{ soal.id }}-B">
+                    <input type="radio"
+                           id="soal-{{ soal.id }}-B"
+                           name="jawaban_{{ soal.id }}"
+                           value="B">
+                    B. {{ soal.option_b }}
+                </label>
+
+                {# Radio button C #}
+                <label class="label-opsi" for="soal-{{ soal.id }}-C">
+                    <input type="radio"
+                           id="soal-{{ soal.id }}-C"
+                           name="jawaban_{{ soal.id }}"
+                           value="C">
+                    C. {{ soal.option_c }}
+                </label>
+
+                {# Radio button D #}
+                <label class="label-opsi" for="soal-{{ soal.id }}-D">
+                    <input type="radio"
+                           id="soal-{{ soal.id }}-D"
+                           name="jawaban_{{ soal.id }}"
+                           value="D">
+                    D. {{ soal.option_d }}
+                </label>
+            </div>
+
+        </div>
+        {% endfor %}
+
+        <!-- Pesan error validasi (diisi oleh JavaScript) -->
+        <div id="pesan-error-quiz" class="pesan-error" style="display:none;"></div>
+
+        <!-- Tombol submit -->
+        <div class="grup-tombol" style="margin-top:1.5rem;">
+            <button type="button" id="tombol-selesai"
+                    class="tombol tombol-primer"
+                    style="font-size:1rem; padding:0.75rem 2rem;">
+                ✅ Selesai Quiz
+            </button>
+        </div>
+
+        <p style="margin-top:1rem; font-size:0.85rem; color:#6b7280;">
+            Pastikan semua soal sudah dijawab sebelum menekan tombol Selesai Quiz.
+        </p>
+
+    </form>
+
+{% endblock %}
+
+{% block scripts %}
+    {#
+        quiz.js menangani validasi "semua soal sudah dijawab" di browser
+        sebelum form dikirim ke Flask.
+        Ini hanya validasi kenyamanan - Flask tetap memproses form apa pun.
+    #}
+    <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+    <script>
+        /*
+         * Di versi Flask, soal sudah di-render oleh Jinja2 di atas.
+         * Kita tidak perlu fungsi tampilkanSemuaSoal() dari quiz.js lagi.
+         *
+         * Yang masih kita pakai dari quiz.js:
+         * - Validasi "semua soal dijawab" sebelum submit form.
+         *
+         * jumlahSoal diambil dari data Flask yang dirender ke halaman.
+         * Ini cara aman mengirim data dari Python ke JavaScript:
+         * render data ke variabel JS di dalam tag script.
+         */
+        var jumlahSoalTotal = {{ jumlah_soal }};
+
+        // Daftar id soal untuk validasi radio button
+        // {{ daftar_soal | map(attribute='id') | list }} menghasilkan [1, 2, 3, ...]
+        var idSoalList = {{ daftar_soal | map(attribute='id') | list | tojson }};
+
+        // Tombol Selesai - validasi dulu sebelum submit form
+        document.getElementById('tombol-selesai').addEventListener('click', function() {
+            var soalBelumDijawab = [];
+
+            // Cek setiap soal apakah sudah ada radio yang dipilih
+            for (var i = 0; i < idSoalList.length; i++) {
+                var idSoal = idSoalList[i];
+                var namaField = 'jawaban_' + idSoal;
+                var radioButtons = document.getElementsByName(namaField);
+                var sudahDipilih = false;
+
+                for (var j = 0; j < radioButtons.length; j++) {
+                    if (radioButtons[j].checked) {
+                        sudahDipilih = true;
+                        break;
+                    }
+                }
+
+                if (!sudahDipilih) {
+                    soalBelumDijawab.push(i + 1); // nomor soal (mulai 1)
+                }
+            }
+
+            if (soalBelumDijawab.length > 0) {
+                // Ada soal yang belum dijawab
+                var elPesan = document.getElementById('pesan-error-quiz');
+                elPesan.textContent = 'Masih ada soal yang belum dijawab: Soal ' +
+                                      soalBelumDijawab.join(', ') +
+                                      '. Silakan lengkapi terlebih dahulu.';
+                elPesan.style.display = 'block';
+
+                // Scroll ke kartu soal pertama yang belum dijawab
+                var indeksPertama = soalBelumDijawab[0] - 1;
+                var elKartu = document.getElementById('kartu-soal-' + indeksPertama);
+                if (elKartu) {
+                    elKartu.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return; // Hentikan, jangan submit
+            }
+
+            // Semua soal sudah dijawab, submit form ke Flask
+            document.getElementById('form-quiz').submit();
+        });
+    </script>
+{% endblock %}

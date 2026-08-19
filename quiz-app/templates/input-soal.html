@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Input Soal - NanasBelajar{% endblock %}
+
+{% block content %}
+
+    <div class="halaman-header">
+        <h1>Input Soal</h1>
+        <p>Ketik atau tempel soal di bawah ini sesuai format, lalu tekan "Parse Soal".</p>
+    </div>
+
+    <!-- Panduan Format -->
+    <section>
+        <div class="kartu">
+            <div class="kartu-judul">Format Soal</div>
+            <p style="margin-bottom:0.75rem; font-size:0.9rem;">Setiap soal harus mengikuti format berikut. Pisahkan antar soal dengan baris kosong.</p>
+            <div class="kotak-format">
+<pre>SOAL 1
+Apa ibu kota Indonesia?
+A. Bandung
+B. Jakarta
+C. Surabaya
+D. Medan
+JAWABAN: B
+
+SOAL 2
+Planet tempat kita tinggal adalah?
+A. Mars
+B. Venus
+C. Bumi
+D. Jupiter
+JAWABAN: C</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Input Soal -->
+    <section>
+        <div class="grup-form">
+            <label for="textarea-soal">Teks Soal</label>
+            <textarea
+                id="textarea-soal"
+                class="textarea-soal"
+                placeholder="Ketik atau tempel soal di sini..."
+                spellcheck="false"
+            ></textarea>
+            <p class="teks-bantuan">Tekan "Muat Contoh Soal" untuk mengisi dengan data contoh.</p>
+        </div>
+
+        <!-- Pesan error parsing (disembunyikan, diisi oleh JavaScript) -->
+        <div id="pesan-error-parse" class="pesan-error" style="display:none;"></div>
+
+        <div class="grup-tombol">
+            <button id="tombol-parse" class="tombol tombol-primer">
+                🔍 Parse Soal
+            </button>
+            <button id="tombol-contoh" class="tombol tombol-abu">
+                📝 Muat Contoh Soal
+            </button>
+        </div>
+    </section>
+
+    <!-- Info soal tersimpan -->
+    <section style="margin-top:2rem;">
+        <div class="kartu">
+            <div class="kartu-judul">Soal Tersimpan di Database</div>
+            {% if jumlah_soal_tersimpan == 0 %}
+                <p style="margin-bottom:0; color:#6b7280;">Belum ada soal tersimpan.</p>
+            {% else %}
+                <p style="margin-bottom:0.5rem;">
+                    <strong>{{ jumlah_soal_tersimpan }} soal</strong> sedang tersimpan di database.
+                </p>
+                <p style="margin-bottom:0; font-size:0.85rem; color:#6b7280;">
+                    Jika Anda menyimpan soal baru, soal lama akan digantikan.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Inisialisasi halaman input soal
+        inisialisasiInputSoal();
+    </script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Preview Soal - NanasBelajar{% endblock %}
+
+{% block content %}
+
+    <div class="halaman-header">
+        <h1>Preview Soal</h1>
+        <p>
+            {#
+                Variabel jumlah_soal dikirim dari Flask route preview_soal_halaman().
+                Di Jinja2, variabel Python ditampilkan dengan {{ }}.
+            #}
+            {{ jumlah_soal }} soal berhasil dibaca. Periksa sebelum menyimpan.
+        </p>
+    </div>
+
+    <!-- Pesan sukses setelah simpan (ditampilkan via flash message di base.html) -->
+
+    <!-- Tombol aksi atas -->
+    <div class="grup-tombol" style="margin-bottom:1.5rem;">
+        {#
+            Tombol Simpan mengirim POST ke /simpan-soal via form.
+            Tidak perlu JavaScript untuk ini - form HTML biasa sudah cukup.
+        #}
+        <form action="{{ url_for('simpan_soal') }}" method="POST" style="display:inline;">
+            <button type="submit" class="tombol tombol-sukses">
+                💾 Simpan Soal ke Database
+            </button>
+        </form>
+        <a href="{{ url_for('input_soal') }}" class="tombol tombol-sekunder">
+            ✏ Edit Soal
+        </a>
+    </div>
+
+    <!-- Preview soal - dirender oleh Jinja2 dari data di session -->
+    {#
+        daftar_soal adalah list of dict yang dikirim Flask dari session.
+        {% for %} di Jinja2 bekerja seperti for loop di Python.
+        loop.index adalah nomor urut (mulai dari 1).
+    #}
+    <section>
+        {% for soal in daftar_soal %}
+        <div class="kartu-soal-preview">
+            <div class="nomor-soal">Soal {{ loop.index }}</div>
+            <div class="teks-soal">{{ soal.question }}</div>
+            <ul class="daftar-opsi">
+                <li>A. {{ soal.optionA }}</li>
+                <li>B. {{ soal.optionB }}</li>
+                <li>C. {{ soal.optionC }}</li>
+                <li>D. {{ soal.optionD }}</li>
+            </ul>
+            <div>
+                {# Tampilkan jawaban benar beserta teks opsinya #}
+                {% if soal.correctAnswer == 'A' %}
+                    <span class="jawaban-benar-label">Jawaban benar: A. {{ soal.optionA }}</span>
+                {% elif soal.correctAnswer == 'B' %}
+                    <span class="jawaban-benar-label">Jawaban benar: B. {{ soal.optionB }}</span>
+                {% elif soal.correctAnswer == 'C' %}
+                    <span class="jawaban-benar-label">Jawaban benar: C. {{ soal.optionC }}</span>
+                {% elif soal.correctAnswer == 'D' %}
+                    <span class="jawaban-benar-label">Jawaban benar: D. {{ soal.optionD }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <!-- Tombol aksi bawah (duplikasi untuk kenyamanan) -->
+    <div class="grup-tombol" style="margin-top:1.5rem;">
+        <form action="{{ url_for('simpan_soal') }}" method="POST" style="display:inline;">
+            <button type="submit" class="tombol tombol-sukses">
+                💾 Simpan Soal ke Database
+            </button>
+        </form>
+        <a href="{{ url_for('input_soal') }}" class="tombol tombol-sekunder">
+            ✏ Edit Soal
+        </a>
+    </div>
+
+{% endblock %}

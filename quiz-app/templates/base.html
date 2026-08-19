@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NanasBelajar{% endblock %}</title>
+
+    {#
+        url_for('static', filename='css/style.css') menghasilkan URL:
+        /static/css/style.css
+        Flask secara otomatis menyajikan file dari folder static/.
+        Ini menggantikan path lama: css/style.css
+    #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- NAVIGASI - sama di semua halaman -->
+    <nav>
+        <div class="nav-dalam">
+            <a href="{{ url_for('index') }}" class="nav-logo">🍍 NanasBelajar</a>
+            <ul class="nav-tautan">
+                <li><a href="{{ url_for('index') }}"
+                    {% if request.endpoint == 'index' %}class="aktif"{% endif %}>
+                    Home
+                </a></li>
+                <li><a href="{{ url_for('input_soal') }}"
+                    {% if request.endpoint == 'input_soal' %}class="aktif"{% endif %}>
+                    Input Soal
+                </a></li>
+                <li><a href="{{ url_for('mulai_quiz') }}"
+                    {% if request.endpoint in ['mulai_quiz', 'quiz'] %}class="aktif"{% endif %}>
+                    Mulai Quiz
+                </a></li>
+                <li><a href="{{ url_for('daftar_nilai') }}"
+                    {% if request.endpoint == 'daftar_nilai' %}class="aktif"{% endif %}>
+                    Daftar Nilai
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- FLASH MESSAGES -->
+    {#
+        flash() di Python mengirim pesan sementara ke template.
+        get_flashed_messages(with_categories=True) mengambil pesan tersebut.
+        Setiap pesan hanya muncul sekali, lalu hilang.
+        Category: 'sukses' atau 'error' - dipakai untuk warna CSS.
+    #}
+    {% with pesan_list = get_flashed_messages(with_categories=True) %}
+        {% if pesan_list %}
+            <div style="max-width:900px; margin: 1rem auto; padding: 0 1.5rem;">
+                {% for kategori, pesan in pesan_list %}
+                    <div class="{{ 'pesan-sukses' if kategori == 'sukses' else 'pesan-error' }}">
+                        {{ pesan }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- KONTEN HALAMAN -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- JAVASCRIPT BERSAMA -->
+    {#
+        url_for('static', filename='js/parser.js') menghasilkan /static/js/parser.js
+        Urutan pemuatan penting: parser.js selalu dimuat pertama.
+    #}
+    <script src="{{ url_for('static', filename='js/parser.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

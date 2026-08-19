@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Quiz - NanasBelajar{% endblock %}
+
+{% block content %}
+
+    {# Jika data_hasil None, tampilkan pesan error #}
+    {% if data_hasil is none %}
+        <div class="pesan-kosong">
+            <p>Data hasil tidak ditemukan.</p>
+            <a href="{{ url_for('index') }}" class="tombol tombol-primer">Kembali ke Beranda</a>
+        </div>
+
+    {% else %}
+
+        <div class="halaman-header">
+            <h1>Hasil Quiz</h1>
+            {#
+                data_hasil adalah sqlite3.Row dari tabel quiz_results.
+                Kolom: id, participant_name, score, correct, wrong,
+                       total_questions, created_at
+                Diakses dengan data_hasil['nama_kolom'] atau data_hasil.nama_kolom
+            #}
+            <p>Tanggal: {{ data_hasil['created_at'] }}</p>
+        </div>
+
+        <!-- Ringkasan Nilai -->
+        <section>
+            <h2>Ringkasan Nilai</h2>
+
+            <!-- Nama peserta -->
+            <div class="kartu" style="margin-bottom:1.25rem;">
+                <div class="kartu-judul">Nama Peserta</div>
+                <p style="font-size:1.3rem; font-weight:700; color:#1f2937; margin-bottom:0;">
+                    {{ data_hasil['participant_name'] }}
+                </p>
+            </div>
+
+            <!-- Kotak angka nilai -->
+            <div class="ringkasan-nilai">
+                <div class="kotak-nilai kotak-nilai-besar">
+                    <div class="angka">{{ data_hasil['score'] }}</div>
+                    <div class="label-angka">Nilai</div>
+                </div>
+                <div class="kotak-nilai">
+                    <div class="angka" style="color:#16a34a;">{{ data_hasil['correct'] }}</div>
+                    <div class="label-angka">Benar</div>
+                </div>
+                <div class="kotak-nilai">
+                    <div class="angka" style="color:#dc2626;">{{ data_hasil['wrong'] }}</div>
+                    <div class="label-angka">Salah</div>
+                </div>
+                <div class="kotak-nilai">
+                    <div class="angka">{{ data_hasil['total_questions'] }}</div>
+                    <div class="label-angka">Total Soal</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tombol aksi -->
+        <div class="grup-tombol" style="margin-top:1rem; margin-bottom:2rem;">
+            <a href="{{ url_for('mulai_quiz') }}" class="tombol tombol-primer">▶ Quiz Lagi</a>
+            <a href="{{ url_for('daftar_nilai') }}" class="tombol tombol-sekunder">📋 Daftar Nilai</a>
+            <a href="{{ url_for('index') }}" class="tombol tombol-abu">🏠 Beranda</a>
+        </div>
+
+        <!-- Review Jawaban per Soal -->
+        <section>
+            <h2>Review Jawaban</h2>
+            <p>Berikut adalah review jawaban soal per soal.</p>
+
+            {#
+                daftar_jawaban adalah hasil query JOIN:
+                    answers JOIN questions ON answers.question_id = questions.id
+                Setiap baris memiliki kolom:
+                    selected_answer, correct_answer, question,
+                    option_a, option_b, option_c, option_d
+
+                get_teks_opsi() adalah fungsi Python yang didaftarkan ke Jinja2
+                di app.py. Fungsi ini mengambil teks opsi berdasarkan huruf.
+                Contoh: get_teks_opsi(jawaban, 'B') => "B. Jakarta"
+            #}
+            {% for jawaban in daftar_jawaban %}
+
+                {# Tentukan class berdasarkan benar/salah #}
+                {% set adalah_benar = jawaban['selected_answer'] == jawaban['correct_answer'] %}
+
+                <div class="kartu-review-soal {{ 'status-benar' if adalah_benar else 'status-salah' }}">
+                    <div class="nomor-soal">Soal {{ loop.index }}</div>
+                    <div class="teks-soal">{{ jawaban['question'] }}</div>
+
+                    <div class="baris-review">
+                        <span class="judul-review">Jawaban kamu:</span>
+                        <span class="isi-review">
+                            {{ get_teks_opsi(jawaban, jawaban['selected_answer']) }}
+                        </span>
+                    </div>
+
+                    <div class="baris-review">
+                        <span class="judul-review">Jawaban benar:</span>
+                        <span class="isi-review">
+                            {{ get_teks_opsi(jawaban, jawaban['correct_answer']) }}
+                        </span>
+                    </div>
+
+                    <div class="baris-review" style="margin-top:0.75rem;">
+                        <span class="judul-review">Status:</span>
+                        <span class="isi-review">
+                            {% if adalah_benar %}
+                                <span class="badge badge-benar">Benar</span>
+                            {% else %}
+                                <span class="badge badge-salah">Salah</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {# Garis pemisah antar soal, kecuali soal terakhir #}
+                {% if not loop.last %}
+                    <hr class="pemisah">
+                {% endif %}
+
+            {% endfor %}
+        </section>
+
+        <!-- Tombol bawah -->
+        <div class="grup-tombol" style="margin-top:2rem;">
+            <a href="{{ url_for('mulai_quiz') }}" class="tombol tombol-primer">▶ Quiz Lagi</a>
+            <a href="{{ url_for('daftar_nilai') }}" class="tombol tombol-sekunder">📋 Daftar Nilai</a>
+        </div>
+
+    {% endif %}
+
+{% endblock %}

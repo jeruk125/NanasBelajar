@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Nilai - NanasBelajar{% endblock %}
+
+{% block content %}
+
+    <div class="halaman-header">
+        <h1>Daftar Nilai</h1>
+        <p>Semua hasil quiz yang tersimpan di database.</p>
+    </div>
+
+    <!-- Tombol aksi -->
+    <div style="margin-bottom:1.25rem; display:flex; justify-content:flex-end; gap:0.75rem; flex-wrap:wrap;">
+        {#
+            Tombol hapus menggunakan form POST, bukan link GET.
+            Ini praktik yang benar: operasi yang mengubah data
+            harus menggunakan POST, bukan GET.
+            Browser tidak akan mengeksekusi POST saat pengguna
+            mengklik back/refresh.
+        #}
+        <form action="{{ url_for('hapus_semua_hasil') }}" method="POST"
+              onsubmit="return confirm('Apakah Anda yakin ingin menghapus SEMUA data hasil quiz?\n\nTindakan ini tidak dapat dibatalkan.')">
+            <button type="submit" class="tombol tombol-bahaya tombol-kecil">
+                🗑 Hapus Semua Hasil
+            </button>
+        </form>
+        <a href="{{ url_for('mulai_quiz') }}" class="tombol tombol-primer tombol-kecil">
+            ▶ Mulai Quiz Baru
+        </a>
+    </div>
+
+    {#
+        semua_hasil adalah list of sqlite3.Row dari query:
+        SELECT * FROM quiz_results ORDER BY created_at DESC
+        Sudah diurutkan dari terbaru ke terlama oleh SQL.
+    #}
+    {% if semua_hasil | length == 0 %}
+        <div class="pesan-kosong">
+            <p>Belum ada peserta yang mengerjakan quiz.</p>
+            <a href="{{ url_for('mulai_quiz') }}" class="tombol tombol-primer">Mulai Quiz</a>
+        </div>
+
+    {% else %}
+        <div class="bungkus-tabel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Nilai</th>
+                        <th>Benar</th>
+                        <th>Salah</th>
+                        <th>Total</th>
+                        <th>Tanggal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#
+                        loop.index = nomor urut (1, 2, 3, ...)
+                        Data sudah diurutkan DESC dari SQL,
+                        jadi baris pertama adalah yang terbaru.
+                    #}
+                    {% for hasil in semua_hasil %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ hasil['participant_name'] }}</td>
+                        <td>
+                            {# Badge warna berdasarkan nilai #}
+                            {% if hasil['score'] >= 80 %}
+                                <span class="nilai-badge nilai-tinggi">{{ hasil['score'] }}</span>
+                            {% elif hasil['score'] >= 60 %}
+                                <span class="nilai-badge nilai-sedang">{{ hasil['score'] }}</span>
+                            {% else %}
+                                <span class="nilai-badge nilai-rendah">{{ hasil['score'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ hasil['correct'] }}</td>
+                        <td>{{ hasil['wrong'] }}</td>
+                        <td>{{ hasil['total_questions'] }}</td>
+                        <td>{{ hasil['created_at'] }}</td>
+                        <td>
+                            {#
+                                Tombol Detail mengarah ke /hasil/<id>
+                                hasil['id'] adalah primary key dari tabel quiz_results.
+                                url_for('hasil', result_id=hasil['id']) menghasilkan
+                                URL seperti /hasil/3
+                            #}
+                            <a href="{{ url_for('hasil', result_id=hasil['id']) }}"
+                               class="tombol tombol-primer tombol-kecil">
+                                Detail
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Keterangan warna -->
+        <div class="kartu" style="margin-top:1.5rem;">
+            <div class="kartu-judul">Keterangan Warna Nilai</div>
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.25rem;">
+                <span><span class="nilai-badge nilai-tinggi">80 - 100</span> Sangat Baik</span>
+                <span><span class="nilai-badge nilai-sedang">60 - 79</span> Cukup</span>
+                <span><span class="nilai-badge nilai-rendah">0 - 59</span> Perlu Belajar Lagi</span>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
