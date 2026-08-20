@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Daftar Materi - NanasBelajar{% endblock %}
+
+{% block content %}
+<div class="kartu" style="max-width: 900px; margin: 2rem auto;">
+    <h1>Daftar Materi</h1>
+
+    {% if semua_materi|length == 0 %}
+        <p style="text-align: center; color: #666; padding: 2rem 0;">Belum ada materi pertemuan yang tersedia.</p>
+    {% else %}
+        <div style="display: grid; gap: 1rem;">
+            {% for m in semua_materi %}
+            <a href="{{ url_for('materi_detail', meeting_id=m.id) }}" style="text-decoration: none; color: inherit;">
+                <div style="border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; transition: box-shadow 0.2s, transform 0.2s; cursor: pointer; background: white;" onmouseover="this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='none'; this.style.transform='none';">
+                    <div style="color: #d81b60; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        [ Pertemuan {{ m.meeting_number }} ]
+                    </div>
+                    <h2 style="margin: 0; font-size: 1.25rem; color: #333;">
+                        {{ m.title }}
+                    </h2>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

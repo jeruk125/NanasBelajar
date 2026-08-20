@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Pertemuan {{ materi.meeting_number }} - NanasBelajar{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 2rem auto;">
+    <a href="{{ url_for('materi_list') }}" class="btn btn-sekunder" style="margin-bottom: 2rem; display: inline-block;">&larr; Kembali ke Daftar Pertemuan</a>
+
+    <div class="kartu">
+        <h1 style="color: #d81b60; margin-top: 0; font-size: 2rem;">Pertemuan {{ materi.meeting_number }}</h1>
+        <h2 style="font-size: 1.5rem; margin-bottom: 2rem; color: #333; border-bottom: 2px solid #eee; padding-bottom: 1rem;">{{ materi.title }}</h2>
+
+        <h3 style="color: #555; margin-top: 2rem;">Tujuan</h3>
+        <div style="white-space: pre-wrap; background: #fafafa; padding: 1.5rem; border-radius: 8px; border: 1px solid #eee; font-size: 1.05rem; line-height: 1.6;">{{ materi.objective }}</div>
+
+        <h3 style="color: #555; margin-top: 2.5rem;">Materi</h3>
+        <div style="white-space: pre-wrap; font-size: 1.1rem; line-height: 1.8; color: #222;">{{ materi.content }}</div>
+
+        {% if materi.example %}
+        <h3 style="color: #555; margin-top: 2.5rem;">Contoh</h3>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-size: 1.05rem; line-height: 1.5;"><code>{{ materi.example }}</code></pre>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

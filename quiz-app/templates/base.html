@@ -24,6 +24,14 @@
                     {% if request.endpoint == 'index' %}class="aktif"{% endif %}>
                     Home
                 </a></li>
+                <li><a href="{{ url_for('materi_list') }}"
+                    {% if request.endpoint in ['materi_list', 'materi_detail'] %}class="aktif"{% endif %}>
+                    Materi
+                </a></li>
+                <li><a href="{{ url_for('input_materi') }}"
+                    {% if request.endpoint in ['input_materi', 'preview_materi_halaman'] %}class="aktif"{% endif %}>
+                    Input Materi
+                </a></li>
                 <li><a href="{{ url_for('input_soal') }}"
                     {% if request.endpoint == 'input_soal' %}class="aktif"{% endif %}>
                     Input Soal

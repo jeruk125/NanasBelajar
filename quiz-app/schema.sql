@@ -73,6 +73,33 @@ CREATE TABLE IF NOT EXISTS quiz_results (
 -- Menyimpan jawaban peserta untuk setiap soal.
 -- Tabel ini dihubungkan ke quiz_results dan questions via foreign key.
 -- ============================================================
+
+
+-- ============================================================
+-- TABEL 4: meetings
+-- Menyimpan materi untuk setiap pertemuan.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS meetings (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    meeting_number   INTEGER NOT NULL UNIQUE,
+    -- Nomor pertemuan. UNIQUE untuk mencegah duplikat.
+
+    title            TEXT    NOT NULL,
+    -- Judul pertemuan.
+
+    objective        TEXT    NOT NULL,
+    -- Tujuan materi.
+
+    content          TEXT    NOT NULL,
+    -- Isi materi (multiline text).
+
+    example          TEXT,
+    -- Contoh kode atau materi (opsional).
+
+    created_at       TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+    -- Waktu materi dibuat.
+);
 CREATE TABLE IF NOT EXISTS answers (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
 
