@@ -604,8 +604,169 @@ def hapus_semua_hasil():
 
 
 # ============================================================
+# FITUR MATERI
+# ============================================================
+
+@app.route('/materi')
+def materi_list():
+    """
+    Menampilkan daftar semua pertemuan materi yang ada di database.
+    """
+    conn = get_db_connection()
+    semua_materi = conn.execute(
+        'SELECT * FROM meetings ORDER BY meeting_number ASC'
+    ).fetchall()
+    conn.close()
+
+    return render_template('materi.html', semua_materi=semua_materi)
+
+
+@app.route('/materi/<int:meeting_id>')
+def materi_detail(meeting_id):
+    """
+    Menampilkan detail materi dari suatu pertemuan.
+    """
+    conn = get_db_connection()
+    materi = conn.execute(
+        'SELECT * FROM meetings WHERE id = ?',
+        (meeting_id,)
+    ).fetchone()
+    conn.close()
+
+    if materi is None:
+        flash('Materi tidak ditemukan.', 'error')
+        return redirect(url_for('materi_list'))
+
+    return render_template('materi-detail.html', materi=materi)
+
+
+@app.route('/admin/materi')
+def input_materi():
+    """
+    Menampilkan halaman input materi.
+    """
+    return render_template('input-materi.html')
+
+
+@app.route('/admin/materi/preview', methods=['POST'])
+def preview_materi_api():
+    """
+    Menerima data materi dari parser JavaScript.
+    Menyimpannya ke session dan mengembalikan status sukses.
+    """
+    data = request.get_json()
+
+    if not data or 'materi' not in data:
+        return jsonify({'error': 'Data materi tidak ditemukan.'}), 400
+
+    daftar_materi = data['materi']
+
+    if len(daftar_materi) == 0:
+        return jsonify({'error': 'Tidak ada materi yang dikirim.'}), 400
+
+    # Validasi di backend (di Python)
+    materi_valid, pesan_error = validasi_daftar_materi(daftar_materi)
+    if not materi_valid:
+        return jsonify({'error': pesan_error}), 400
+
+    # Simpan sementara ke session
+    session['materi_preview'] = daftar_materi
+
+    return jsonify({'sukses': True, 'jumlah': len(daftar_materi)})
+
+
+@app.route('/admin/materi/preview', methods=['GET'])
+def preview_materi_halaman():
+    """
+    Menampilkan halaman preview materi dari session.
+    """
+    daftar_materi = session.get('materi_preview', None)
+
+    if daftar_materi is None:
+        return redirect(url_for('input_materi'))
+
+    return render_template(
+        'preview-materi.html',
+        daftar_materi=daftar_materi,
+        jumlah_materi=len(daftar_materi)
+    )
+
+
+@app.route('/admin/materi/save', methods=['POST'])
+def simpan_materi():
+    """
+    Menyimpan data materi dari session ke database (APPEND/Tambahkan).
+    """
+    daftar_materi = session.get('materi_preview', None)
+
+    if daftar_materi is None:
+        flash('Tidak ada materi untuk disimpan.', 'error')
+        return redirect(url_for('input_materi'))
+
+    conn = get_db_connection()
+    try:
+        # Cek apakah ada duplikat nomor pertemuan (di dalam session dan di database)
+        for materi in daftar_materi:
+            cek = conn.execute(
+                'SELECT id FROM meetings WHERE meeting_number = ?',
+                (materi['meeting_number'],)
+            ).fetchone()
+
+            if cek is not None:
+                raise Exception(f"Pertemuan {materi['meeting_number']} sudah ada di database. Harap gunakan nomor pertemuan yang berbeda.")
+
+        # Insert setiap materi
+        for materi in daftar_materi:
+            conn.execute(
+                '''INSERT INTO meetings
+                   (meeting_number, title, objective, content, example)
+                   VALUES (?, ?, ?, ?, ?)''',
+                (
+                    materi['meeting_number'],
+                    materi['title'],
+                    materi['objective'],
+                    materi['content'],
+                    materi.get('example', '')
+                )
+            )
+
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        flash(str(e), 'error')
+        return redirect(url_for('preview_materi_halaman'))
+
+    conn.close()
+
+    # Hapus dari session jika sukses
+    session.pop('materi_preview', None)
+
+    flash(f'{len(daftar_materi)} pertemuan materi berhasil ditambahkan!', 'sukses')
+    return redirect(url_for('materi_list'))
+
+
+# ============================================================
 # FUNGSI HELPER
 # ============================================================
+
+def validasi_daftar_materi(daftar_materi):
+    """
+    Memvalidasi data materi yang diterima.
+    """
+    for materi in daftar_materi:
+        nmr = materi.get('meeting_number', 'Tidak Diketahui')
+
+        if not materi.get('meeting_number'):
+            return False, 'Terdapat pertemuan tanpa nomor pertemuan yang jelas.'
+        if not materi.get('title', '').strip():
+            return False, f'Pertemuan {nmr}: JUDUL tidak boleh kosong.'
+        if not materi.get('objective', '').strip():
+            return False, f'Pertemuan {nmr}: TUJUAN tidak boleh kosong.'
+        if not materi.get('content', '').strip():
+            return False, f'Pertemuan {nmr}: MATERI tidak boleh kosong.'
+
+    return True, ''
 
 def validasi_daftar_soal(daftar_soal):
     """

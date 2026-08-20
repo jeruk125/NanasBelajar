@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Preview Materi - NanasBelajar{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 2rem auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Preview Materi ({{ jumlah_materi }} Pertemuan)</h1>
+        <div>
+            <a href="{{ url_for('input_materi') }}" class="btn btn-sekunder" style="margin-right: 1rem;">Edit Lagi</a>
+
+            <form action="{{ url_for('simpan_materi') }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-utama">Simpan Materi</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="pesan-info" style="background-color: #e3f2fd; color: #0d47a1; padding: 1rem; border-radius: 4px; margin-bottom: 2rem; border-left: 4px solid #1976d2;">
+        <strong>Perhatian:</strong> Materi belum disimpan ke database. Silakan periksa kembali materi di bawah ini.
+    </div>
+
+    {% for m in daftar_materi %}
+    <div class="kartu" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0; color: #d81b60;">Pertemuan {{ m.meeting_number }}</h2>
+        <h3>{{ m.title }}</h3>
+
+        <h4 style="margin-top: 1.5rem; color: #555;">Tujuan</h4>
+        <div style="white-space: pre-wrap; background: #fafafa; padding: 1rem; border-radius: 4px; border: 1px solid #eee;">{{ m.objective }}</div>
+
+        <h4 style="margin-top: 1.5rem; color: #555;">Materi</h4>
+        <div style="white-space: pre-wrap; line-height: 1.6;">{{ m.content }}</div>
+
+        {% if m.example %}
+        <h4 style="margin-top: 1.5rem; color: #555;">Contoh</h4>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 1rem; border-radius: 4px; overflow-x: auto;"><code>{{ m.example }}</code></pre>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
