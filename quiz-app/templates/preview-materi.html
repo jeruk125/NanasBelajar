@@ -6,11 +6,11 @@
 <div style="max-width: 900px; margin: 2rem auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h1>Preview Materi ({{ jumlah_materi }} Pertemuan)</h1>
-        <div>
-            <a href="{{ url_for('input_materi') }}" class="btn btn-sekunder" style="margin-right: 1rem;">Edit Lagi</a>
+        <div class="grup-tombol">
+            <a href="{{ url_for('input_materi') }}" class="tombol tombol-sekunder">Edit Lagi</a>
 
             <form action="{{ url_for('simpan_materi') }}" method="POST" style="display: inline;">
-                <button type="submit" class="btn btn-utama">Simpan Materi</button>
+                <button type="submit" class="tombol tombol-primer">Simpan Materi</button>
             </form>
         </div>
     </div>

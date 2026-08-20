@@ -15,9 +15,9 @@
         <textarea id="teks-materi" rows="20" style="width: 100%; font-family: monospace; padding: 0.5rem; font-size: 1rem;" placeholder="Ketik materi di sini...">{{ teks_materi }}</textarea>
     </div>
 
-    <div>
-        <a href="{{ url_for('materi_detail', meeting_id=meeting_id) }}" class="btn btn-sekunder" style="margin-right: 0.5rem;">Batal</a>
-        <button type="button" class="btn btn-utama" onclick="jalankanParseEditMateri()">Parse Perubahan</button>
+    <div class="grup-tombol">
+        <button type="button" class="tombol tombol-primer" onclick="jalankanParseEditMateri()">Parse Perubahan</button>
+        <a href="{{ url_for('materi_detail', meeting_id=meeting_id) }}" class="tombol tombol-sekunder">Batal</a>
     </div>
 </div>
 {% endblock %}

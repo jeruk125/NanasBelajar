@@ -6,11 +6,11 @@
 <div style="max-width: 900px; margin: 2rem auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h1>Preview Perubahan</h1>
-        <div>
-            <a href="{{ url_for('edit_materi', meeting_id=meeting_id) }}" class="btn btn-sekunder" style="margin-right: 1rem;">Edit Lagi</a>
+        <div class="grup-tombol">
+            <a href="{{ url_for('edit_materi', meeting_id=meeting_id) }}" class="tombol tombol-sekunder">Edit Lagi</a>
 
             <form action="{{ url_for('simpan_edit_materi', meeting_id=meeting_id) }}" method="POST" style="display: inline;">
-                <button type="submit" class="btn btn-utama">Simpan Perubahan</button>
+                <button type="submit" class="tombol tombol-primer">Simpan Perubahan</button>
             </form>
         </div>
     </div>
