@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Materi - NanasBelajar{% endblock %}
+
+{% block content %}
+<div class="kartu" style="max-width: 900px; margin: 2rem auto;">
+    <h1>Edit Materi</h1>
+
+    <div id="error-container" class="pesan-error" style="display: none; margin-bottom: 1rem;">
+        <ul id="error-list" style="margin: 0; padding-left: 1.5rem;"></ul>
+    </div>
+
+    <!-- Form Input Teks -->
+    <div style="margin-bottom: 1rem;">
+        <textarea id="teks-materi" rows="20" style="width: 100%; font-family: monospace; padding: 0.5rem; font-size: 1rem;" placeholder="Ketik materi di sini...">{{ teks_materi }}</textarea>
+    </div>
+
+    <div>
+        <a href="{{ url_for('materi_detail', meeting_id=meeting_id) }}" class="btn btn-sekunder" style="margin-right: 0.5rem;">Batal</a>
+        <button type="button" class="btn btn-utama" onclick="jalankanParseEditMateri()">Parse Perubahan</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/materi-parser.js') }}"></script>
+<script>
+function jalankanParseEditMateri() {
+    var textarea = document.getElementById('teks-materi');
+    var teks = textarea.value;
+
+    var hasilParse = parseMateri(teks);
+
+    var errorContainer = document.getElementById('error-container');
+    var errorList = document.getElementById('error-list');
+
+    errorList.innerHTML = '';
+
+    if (hasilParse.errors.length > 0) {
+        errorContainer.style.display = 'block';
+        for (var i = 0; i < hasilParse.errors.length; i++) {
+            var li = document.createElement('li');
+            li.textContent = hasilParse.errors[i];
+            errorList.appendChild(li);
+        }
+        window.scrollTo(0, 0);
+        return;
+    }
+
+    if (hasilParse.materi.length !== 1) {
+         errorContainer.style.display = 'block';
+         var li = document.createElement('li');
+         li.textContent = "Error: Anda hanya bisa mengedit satu materi sekaligus.";
+         errorList.appendChild(li);
+         window.scrollTo(0, 0);
+         return;
+    }
+
+    errorContainer.style.display = 'none';
+
+    // Jika valid, kirim ke server via AJAX
+    fetch('{{ url_for("preview_edit_materi_api", meeting_id=meeting_id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ materi: hasilParse.materi })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sukses) {
+            window.location.href = '{{ url_for("preview_edit_materi_halaman", meeting_id=meeting_id) }}';
+        } else {
+            alert('Error dari server: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menghubungi server.');
+    });
+}
+</script>
+{% endblock %}

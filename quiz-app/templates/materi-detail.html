@@ -4,7 +4,15 @@
 
 {% block content %}
 <div style="max-width: 900px; margin: 2rem auto;">
-    <a href="{{ url_for('materi_list') }}" class="btn btn-sekunder" style="margin-bottom: 2rem; display: inline-block;">&larr; Kembali ke Daftar Pertemuan</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <a href="{{ url_for('materi_list') }}" class="btn btn-sekunder">&larr; Kembali ke Daftar Pertemuan</a>
+        <div>
+            <a href="{{ url_for('edit_materi', meeting_id=materi.id) }}" class="btn btn-utama" style="margin-right: 0.5rem; background-color: #fbc02d; color: #333;">Edit Materi</a>
+            <form action="{{ url_for('delete_materi', meeting_id=materi.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus materi pertemuan ini?');">
+                <button type="submit" class="btn btn-utama" style="background-color: #d32f2f;">Hapus</button>
+            </form>
+        </div>
+    </div>
 
     <div class="kartu">
         <h1 style="color: #d81b60; margin-top: 0; font-size: 2rem;">Pertemuan {{ materi.meeting_number }}</h1>

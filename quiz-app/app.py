@@ -621,6 +621,24 @@ def materi_list():
     return render_template('materi.html', semua_materi=semua_materi)
 
 
+@app.route('/admin/materi/<int:meeting_id>/delete', methods=['POST'])
+def delete_materi(meeting_id):
+    """
+    Menghapus materi dari database.
+    """
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM meetings WHERE id = ?', (meeting_id,))
+        conn.commit()
+        flash('Materi berhasil dihapus.', 'sukses')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Gagal menghapus materi: {str(e)}', 'error')
+    finally:
+        conn.close()
+
+    return redirect(url_for('materi_list'))
+
 @app.route('/materi/<int:meeting_id>')
 def materi_detail(meeting_id):
     """
@@ -638,6 +656,129 @@ def materi_detail(meeting_id):
         return redirect(url_for('materi_list'))
 
     return render_template('materi-detail.html', materi=materi)
+
+
+@app.route('/admin/materi/<int:meeting_id>/preview', methods=['POST'])
+def preview_edit_materi_api(meeting_id):
+    """
+    Menerima data edit materi dari parser JavaScript.
+    Menyimpannya ke session dan mengembalikan status sukses.
+    """
+    data = request.get_json()
+
+    if not data or 'materi' not in data:
+        return jsonify({'error': 'Data materi tidak ditemukan.'}), 400
+
+    daftar_materi = data['materi']
+
+    if len(daftar_materi) != 1:
+        return jsonify({'error': 'Anda hanya dapat mengedit satu materi sekaligus.'}), 400
+
+    # Validasi di backend
+    materi_valid, pesan_error = validasi_daftar_materi(daftar_materi)
+    if not materi_valid:
+        return jsonify({'error': pesan_error}), 400
+
+    # Simpan sementara ke session
+    session['edit_materi_preview'] = daftar_materi[0]
+
+    return jsonify({'sukses': True})
+
+@app.route('/admin/materi/<int:meeting_id>/preview', methods=['GET'])
+def preview_edit_materi_halaman(meeting_id):
+    """
+    Menampilkan halaman preview perubahan materi dari session.
+    """
+    materi_preview = session.get('edit_materi_preview', None)
+
+    if materi_preview is None:
+        return redirect(url_for('edit_materi', meeting_id=meeting_id))
+
+    return render_template(
+        'preview-edit-materi.html',
+        meeting_id=meeting_id,
+        m=materi_preview
+    )
+
+
+@app.route('/admin/materi/<int:meeting_id>/save', methods=['POST'])
+def simpan_edit_materi(meeting_id):
+    """
+    Menyimpan perubahan data materi dari session ke database (UPDATE).
+    """
+    materi = session.get('edit_materi_preview', None)
+
+    if materi is None:
+        flash('Tidak ada perubahan materi untuk disimpan.', 'error')
+        return redirect(url_for('edit_materi', meeting_id=meeting_id))
+
+    conn = get_db_connection()
+    try:
+        # Pastikan meeting_number yang baru tidak bentrok dengan materi LAIN
+        cek = conn.execute(
+            'SELECT id FROM meetings WHERE meeting_number = ? AND id != ?',
+            (materi['meeting_number'], meeting_id)
+        ).fetchone()
+
+        if cek is not None:
+            raise Exception(f"Pertemuan {materi['meeting_number']} sudah dipakai oleh materi lain. Harap gunakan nomor pertemuan yang berbeda.")
+
+        # Update materi
+        conn.execute(
+            '''UPDATE meetings
+               SET meeting_number = ?, title = ?, objective = ?, content = ?, example = ?
+               WHERE id = ?''',
+            (
+                materi['meeting_number'],
+                materi['title'],
+                materi['objective'],
+                materi['content'],
+                materi.get('example', ''),
+                meeting_id
+            )
+        )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        flash(str(e), 'error')
+        return redirect(url_for('preview_edit_materi_halaman', meeting_id=meeting_id))
+
+    conn.close()
+
+    # Hapus dari session jika sukses
+    session.pop('edit_materi_preview', None)
+
+    flash('Materi pertemuan berhasil diperbarui!', 'sukses')
+    return redirect(url_for('materi_detail', meeting_id=meeting_id))
+
+
+@app.route('/admin/materi/<int:meeting_id>/edit')
+def edit_materi(meeting_id):
+    """
+    Menampilkan halaman edit materi dengan teks yang dikonstruksi ulang dari database.
+    """
+    conn = get_db_connection()
+    materi = conn.execute(
+        'SELECT * FROM meetings WHERE id = ?',
+        (meeting_id,)
+    ).fetchone()
+    conn.close()
+
+    if materi is None:
+        flash('Materi tidak ditemukan.', 'error')
+        return redirect(url_for('materi_list'))
+
+    # Rekonstruksi teks
+    teks_materi = f"PERTEMUAN {materi['meeting_number']}\n"
+    teks_materi += f"JUDUL: {materi['title']}\n\n"
+    teks_materi += f"TUJUAN:\n{materi['objective']}\n\n"
+    teks_materi += f"MATERI:\n{materi['content']}"
+
+    if materi['example'] and str(materi['example']).strip() != "":
+        teks_materi += f"\n\nCONTOH:\n{materi['example']}"
+
+    return render_template('edit-materi.html', meeting_id=meeting_id, teks_materi=teks_materi)
 
 
 @app.route('/admin/materi')
